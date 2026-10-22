@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "pl.emoticat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["ChatHudMixin", "PlayerEntityRendererMixin", "PlayerEntityModelMixin"],
+  "injectors": { "defaultRequire": 1 }
+}

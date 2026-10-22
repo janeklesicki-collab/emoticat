@@ -1,0 +1,238 @@
+{
+ "providers": [
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/lol.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue000"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/smile.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue001"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/sad.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue002"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/cry.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue003"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/angry.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue004"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/love.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue005"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/cool.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue006"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/wow.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue007"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/think.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue008"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/sleep.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue009"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/party.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue00a"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/skull.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue00b"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/wink.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue00c"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/sick.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue00d"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/clown.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue00e"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/heart.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue00f"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/fire.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue010"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/star.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue011"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/diamond.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue012"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/creeper.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue013"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/sword.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue014"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/gg.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue015"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/ez.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue016"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/luzer.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue017"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/kosz.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue018"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "emoticat:font/warden.png",
+   "ascent": 8,
+   "height": 9,
+   "chars": [
+    "\ue019"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "emoticat",
+  "version": "${version}",
+  "name": "EmotiCat",
+  "description": "EmotiCat w czacie widoczne tylko dla osob z modem. Menu pod klawiszem N.",
+  "authors": ["you"],
+  "environment": "client",
+  "entrypoints": { "client": ["pl.emoticat.EmotiCatMod"] },
+  "mixins": ["emoticat.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
