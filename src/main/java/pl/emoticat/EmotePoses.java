@@ -14,10 +14,7 @@ public class EmotePoses {
         }
         if (f.warden() && f.wardenT() < EmoteManager.WARDEN_ANIM) wardenPull(m, f.wardenT());
 
-        m.hat.copyTransform(m.head);
-        m.leftSleeve.copyTransform(m.leftArm);
-        m.rightSleeve.copyTransform(m.rightArm);
-        m.jacket.copyTransform(m.body);
+
     }
 
     /** Luzer: ręka przy czole ("L"), druga celuje w ciebie, głowa się trzęsie ze śmiechu. */
