@@ -4,65 +4,148 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Stan animowanych emotek: Luzer, Kosz (głowa jako piłka), Warden na plecach. */
+/** Stan emotek: każda emotka to animacja postaci gracza. Warden na plecach to przełącznik. */
 public class EmoteManager {
     public record Active(String name, int startAge) {}
     public record Frame(String emote, float emoteT, boolean warden, float wardenT,
                         boolean sneaking, float limbPos, float limbSpeed, float age) {}
 
     public static final int WARDEN_ANIM = 70;      // ticki animacji wyciągania i zakładania
-    private static final int MAX_TICKS = 20 * 20;  // Luzer/Kosz trwają max 20 s
 
-    private static final Pattern CODE = Pattern.compile(":(luzer|kosz|warden):");
+    private static Pattern CODE;
     public static final Map<UUID, Active> ACTIVE = new HashMap<>();
     public static final Map<UUID, Integer> WARDEN = new HashMap<>();
     private static final Map<UUID, Vec3d> LAST = new HashMap<>();
+    private static final Map<String, Long> ECHO = new HashMap<>();
     /** Dane dla jednej klatki renderu (klucz = obiekt stanu renderu gracza). */
     public static final Map<Object, Frame> FRAMES = new WeakHashMap<>();
 
-    public static void clear() { ACTIVE.clear(); WARDEN.clear(); LAST.clear(); }
+    private static Pattern code() {
+        if (CODE == null) CODE = Pattern.compile(":(" + String.join("|", Emotes.NAMES) + "):");
+        return CODE;
+    }
 
-    /** Co tick: chodzenie / skok / kucanie kończy emotki (Warden zostaje na plecach). */
+    public static void clear() { ACTIVE.clear(); WARDEN.clear(); LAST.clear(); ECHO.clear(); }
+
+    private static boolean inputPressed(MinecraftClient mc) {
+        var o = mc.options;
+        return o.forwardKey.isPressed() || o.backKey.isPressed() || o.leftKey.isPressed()
+                || o.rightKey.isPressed() || o.jumpKey.isPressed() || o.sneakKey.isPressed();
+    }
+
+    /** Co tick: ruch, skok, kucanie, obrażenia albo upływ czasu kończą emotkę. */
     public static void tick(ClientWorld world) {
+        MinecraftClient mc = MinecraftClient.getInstance();
         for (AbstractClientPlayerEntity p : world.getPlayers()) {
             UUID id = p.getUuid();
             Vec3d pos = p.getPos();
             Vec3d last = LAST.put(id, pos);
             boolean moved = last != null && (
-                    (pos.x - last.x) * (pos.x - last.x) + (pos.z - last.z) * (pos.z - last.z) > 0.0009
+                    (pos.x - last.x) * (pos.x - last.x) + (pos.z - last.z) * (pos.z - last.z) > 0.0004
                     || Math.abs(pos.y - last.y) > 0.08);
+            boolean keys = p == mc.player && inputPressed(mc);
+
             Active a = ACTIVE.get(id);
-            if (a != null && (moved || p.isSneaking() || p.age - a.startAge() > MAX_TICKS)) ACTIVE.remove(id);
+            if (a != null) {
+                int t = p.age - a.startAge();
+                boolean stop = t > Emotes.duration(a.name())
+                        || (t > 3 && (moved || keys || p.isSneaking() || p.hasVehicle() || p.hurtTime > 0));
+                if (stop) ACTIVE.remove(id);
+                else particles(world, p, a.name(), t);
+            }
             Integer w = WARDEN.get(id);
-            if (w != null && moved && p.age - w < WARDEN_ANIM) WARDEN.put(id, p.age - WARDEN_ANIM);
+            if (w != null && (moved || keys) && p.age - w < WARDEN_ANIM) WARDEN.put(id, p.age - WARDEN_ANIM);
         }
     }
 
-    /** Wiadomość z czatu zawiera :luzer: / :kosz: / :warden: -> odpal animację u nadawcy. */
+    private static void particles(ClientWorld w, AbstractClientPlayerEntity p, String name, int t) {
+        double x = p.getX(), y = p.getY(), z = p.getZ();
+        double r = Math.toRadians(p.bodyYaw);
+        double fx = -Math.sin(r), fz = Math.cos(r);       // przód
+        double sx = Math.cos(r), sz = Math.sin(r);        // bok
+        double side = Math.random() < 0.5 ? 1 : -1;
+        double rx = (Math.random() - 0.5) * 0.8, rz = (Math.random() - 0.5) * 0.8;
+        switch (name) {
+            case "love", "heart" -> {
+                if (t % 6 == 0) w.addParticle(ParticleTypes.HEART, x + rx, y + 2.0, z + rz, 0, 0.05, 0);
+            }
+            case "angry" -> {
+                if (t % 10 == 0) w.addParticle(ParticleTypes.ANGRY_VILLAGER, x, y + 2.1, z, 0, 0, 0);
+            }
+            case "cry" -> {
+                if (t % 3 == 0) w.addParticle(ParticleTypes.FALLING_WATER,
+                        x + fx * 0.3 + sx * 0.15 * side, y + 1.6, z + fz * 0.3 + sz * 0.15 * side, 0, 0, 0);
+            }
+            case "fire" -> w.addParticle(ParticleTypes.FLAME, x + rx, y + 0.3 + Math.random() * 1.5, z + rz, 0, 0.02, 0);
+            case "star" -> {
+                if (t % 2 == 0) w.addParticle(ParticleTypes.END_ROD, x + rx * 1.5, y + 0.5 + Math.random() * 1.8, z + rz * 1.5, 0, 0.02, 0);
+            }
+            case "diamond" -> {
+                if (t % 2 == 0) w.addParticle(ParticleTypes.ENCHANT, x + rx, y + 1.0 + Math.random(), z + rz, 0, 0.1, 0);
+            }
+            case "party" -> {
+                if (t % 5 == 0) w.addParticle(ParticleTypes.NOTE, x, y + 2.2, z, Math.random(), 0, 0);
+            }
+            case "sick" -> {
+                if (t % 4 == 0) w.addParticle(ParticleTypes.HAPPY_VILLAGER, x + fx * 0.3, y + 1.5, z + fz * 0.3, 0, 0, 0);
+            }
+            case "sleep" -> {
+                if (t % 12 == 0) w.addParticle(ParticleTypes.CLOUD, x + fx * 0.3, y + 1.9, z + fz * 0.3, 0, 0.04, 0);
+            }
+            case "skull" -> {
+                if (t % 6 == 0) w.addParticle(ParticleTypes.SOUL, x + rx, y + 1.0, z + rz, 0, 0.05, 0);
+            }
+            case "sword" -> {
+                if (t % 11 == 5) w.addParticle(ParticleTypes.SWEEP_ATTACK, x + fx, y + 1.2, z + fz, 0, 0, 0);
+            }
+            case "gg" -> {
+                if (t % 9 == 4) w.addParticle(ParticleTypes.CRIT, x + fx * 0.6, y + 1.2, z + fz * 0.6, 0, 0.1, 0);
+            }
+            case "creeper" -> {
+                if (t == 45) w.addParticle(ParticleTypes.EXPLOSION, x, y + 1.0, z, 0, 0, 0);
+            }
+            default -> {}
+        }
+    }
+
+    /** Wiadomość z czatu zawiera :nazwa: -> odpal animację u nadawcy. */
     public static void onMessage(String text, UUID senderOrNull) {
-        Matcher m = CODE.matcher(text);
+        Matcher m = code().matcher(text);
         if (!m.find()) return;
-        ClientWorld world = MinecraftClient.getInstance().world;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        ClientWorld world = mc.world;
         if (world == null) return;
-        AbstractClientPlayerEntity p = null;
+        AbstractClientPlayerEntity p;
         if (senderOrNull != null) {
             p = world.getPlayers().stream().filter(x -> x.getUuid().equals(senderOrNull)).findFirst().orElse(null);
         } else {
             p = findByName(world, text);
         }
         if (p == null) return;
-        String code = m.group(1);
-        if (p == MinecraftClient.getInstance().player) {   // własne echo już odegrane lokalnie
-            Long exp = ECHO.remove(code);
+        String name = m.group(1);
+        if (p == mc.player) {                              // własne echo już odegrane lokalnie
+            Long exp = ECHO.remove(name);
             if (exp != null && exp > System.currentTimeMillis()) return;
         }
-        start(p, code);
+        start(p, name);
+    }
+
+    /** Użycie emotki z Hubu: animacja od razu; opcjonalnie sygnał dla innych graczy z modem. */
+    public static void useEmote(String name, boolean share) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) return;
+        start(mc.player, name);
+        if (share) {
+            ECHO.put(name, System.currentTimeMillis() + 5000);
+            mc.player.networkHandler.sendChatMessage(":" + name + ":");
+        }
     }
 
     private static AbstractClientPlayerEntity findByName(ClientWorld world, String text) {
@@ -82,23 +165,6 @@ public class EmoteManager {
             }
         }
         return best;
-    }
-
-    private static final Map<String, Long> ECHO = new HashMap<>();
-
-    /** Użycie emotki z Hubu: animacje odpalają się od razu, ikonki lecą jako wiadomość. */
-    public static void useEmote(String name, boolean share) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null) return;
-        if (Emotes.isAnim(name)) {
-            start(mc.player, name);                       // od razu u siebie
-            if (share) {                                  // sygnał dla innych graczy z modem
-                ECHO.put(name, System.currentTimeMillis() + 5000);
-                mc.player.networkHandler.sendChatMessage(":" + name + ":");
-            }
-        } else {
-            mc.player.networkHandler.sendChatMessage(":" + name + ":");
-        }
     }
 
     private static boolean isWord(char c) { return Character.isLetterOrDigit(c) || c == '_'; }

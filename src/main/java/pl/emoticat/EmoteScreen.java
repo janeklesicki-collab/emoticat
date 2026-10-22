@@ -15,7 +15,7 @@ import java.util.List;
 /** EmotiCat Hub: zakładki, wyszukiwarka, ulubione (PPM) i ostatnio użyte. */
 public class EmoteScreen extends Screen {
     private enum Tab {
-        ALL("Wszystkie"), FACES("Twarze"), SYMBOLS("Symbole"), ANIM("Animacje"), FAV("Ulubione");
+        ALL("Wszystkie"), FACES("Twarze"), SYMBOLS("Symbole"), ANIM("Specjalne"), FAV("Ulubione");
         final String label;
         Tab(String l) { label = l; }
     }
@@ -130,7 +130,7 @@ public class EmoteScreen extends Screen {
 
         int fy = gridBottom + 8;
         if (hover != null) {
-            String extra = Emotes.isAnim(hover) ? "  (animacja)" : "";
+            String extra = "  (animacja)";
             ctx.drawCenteredTextWithShadow(textRenderer, ":" + hover + ":" + extra, width / 2, fy, 0xFFFF55);
         }
         ctx.drawCenteredTextWithShadow(textRenderer,

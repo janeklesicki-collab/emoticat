@@ -15,7 +15,7 @@ public class Emotes {
      * LISTA EMOTEK. Żeby dodać nową:
      * 1) dopisz nazwę na końcu tej tablicy (nie zmieniaj kolejności istniejących!)
      * 2) wrzuć textures/font/<nazwa>.png (32x32) do assets/emoticat/
-     * 3) dopisz wpis w assets/emoticat/font/emotes.json z kolejnym znakiem E000
+     * 3) dopisz wpis w assets/emoticat/font/emotes.json z kolejnym znakiem z zakresu E000 (prywatny zakres Unicode)
      */
     public static final String[] NAMES = {
         "lol", "smile", "sad", "cry", "angry", "love", "cool", "wow", "think", "sleep",
@@ -34,6 +34,16 @@ public class Emotes {
     public static boolean isFace(String n) { return FACES.contains(n); }
     public static boolean isAnim(String n) { return ANIM.contains(n); }
     public static boolean isSymbol(String n) { return !isFace(n) && !isAnim(n); }
+
+    /** Ile ticków trwa emotka (20 ticków = 1 s), jeśli gracz wcześniej się nie ruszy. */
+    public static int duration(String n) {
+        return switch (n) {
+            case "creeper" -> 50;
+            case "wow" -> 60;
+            case "gg", "ez" -> 80;
+            default -> 400;
+        };
+    }
 
     public static Identifier texture(String name) {
         return Identifier.of("emoticat", "textures/font/" + name + ".png");
