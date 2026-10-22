@@ -15,7 +15,7 @@ public class Emotes {
      * LISTA EMOTEK. Żeby dodać nową:
      * 1) dopisz nazwę na końcu tej tablicy (nie zmieniaj kolejności istniejących!)
      * 2) wrzuć textures/font/<nazwa>.png (32x32) do assets/emoticat/
-     * 3) dopisz wpis w assets/emoticat/font/emotes.json z kolejnym znakiem \uE0xx
+     * 3) dopisz wpis w assets/emoticat/font/emotes.json z kolejnym znakiem E000
      */
     public static final String[] NAMES = {
         "lol", "smile", "sad", "cry", "angry", "love", "cool", "wow", "think", "sleep",
