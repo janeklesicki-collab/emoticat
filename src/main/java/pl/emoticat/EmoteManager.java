@@ -23,7 +23,7 @@ public class EmoteManager {
     public static final Map<UUID, Active> ACTIVE = new HashMap<>();
     public static final Map<UUID, Integer> WARDEN = new HashMap<>();
     private static final Map<UUID, Vec3d> LAST = new HashMap<>();
-    private static final Map<String, Long> ECHO = new HashMap<>();
+    private static final Map<String, ArrayDeque<Long>> ECHO = new HashMap<>();
     /** Dane dla jednej klatki renderu (klucz = obiekt stanu renderu gracza). */
     public static final Map<Object, Frame> FRAMES = new WeakHashMap<>();
 
@@ -60,6 +60,7 @@ public class EmoteManager {
                 if (stop) ACTIVE.remove(id);
                 else particles(world, p, a.name(), t);
             }
+            if (!p.isAlive()) { ACTIVE.remove(id); WARDEN.remove(id); continue; }
             Integer w = WARDEN.get(id);
             if (w != null && (moved || keys) && p.age - w < WARDEN_ANIM) WARDEN.put(id, p.age - WARDEN_ANIM);
         }
@@ -130,10 +131,7 @@ public class EmoteManager {
         }
         if (p == null) return;
         String name = m.group(1);
-        if (p == mc.player) {                              // własne echo już odegrane lokalnie
-            Long exp = ECHO.remove(name);
-            if (exp != null && exp > System.currentTimeMillis()) return;
-        }
+        if (p == mc.player && consumeEcho(name)) return;   // własne echo już odegrane lokalnie
         start(p, name);
     }
 
@@ -143,9 +141,19 @@ public class EmoteManager {
         if (mc.player == null) return;
         start(mc.player, name);
         if (share) {
-            ECHO.put(name, System.currentTimeMillis() + 5000);
+            ECHO.computeIfAbsent(name, k -> new ArrayDeque<>()).addLast(System.currentTimeMillis() + 5000);
             mc.player.networkHandler.sendChatMessage(":" + name + ":");
         }
+    }
+
+    private static boolean consumeEcho(String name) {
+        ArrayDeque<Long> q = ECHO.get(name);
+        if (q == null) return false;
+        long now = System.currentTimeMillis();
+        while (!q.isEmpty() && q.peekFirst() < now) q.pollFirst();
+        if (q.isEmpty()) return false;
+        q.pollFirst();
+        return true;
     }
 
     private static AbstractClientPlayerEntity findByName(ClientWorld world, String text) {

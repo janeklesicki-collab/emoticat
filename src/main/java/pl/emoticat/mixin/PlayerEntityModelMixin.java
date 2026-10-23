@@ -11,8 +11,22 @@ import pl.emoticat.EmotePoses;
 
 @Mixin(PlayerEntityModel.class)
 public class PlayerEntityModelMixin {
-    @Inject(method = "setAngles(Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;)V",
-            at = @At("TAIL"))
+    private static final String SET_ANGLES =
+            "setAngles(Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;)V";
+
+    /** Model jest wspólny dla wszystkich graczy, więc przed każdym graczem czyścimy pozy z emotek. */
+    @Inject(method = SET_ANGLES, at = @At("HEAD"))
+    private void emoticat$reset(PlayerEntityRenderState state, CallbackInfo ci) {
+        PlayerEntityModel m = (PlayerEntityModel) (Object) this;
+        m.head.resetTransform();
+        m.body.resetTransform();
+        m.rightArm.resetTransform();
+        m.leftArm.resetTransform();
+        m.rightLeg.resetTransform();
+        m.leftLeg.resetTransform();
+    }
+
+    @Inject(method = SET_ANGLES, at = @At("TAIL"))
     private void emoticat$pose(PlayerEntityRenderState state, CallbackInfo ci) {
         EmoteManager.Frame f = EmoteManager.FRAMES.get(state);
         if (f != null) EmotePoses.apply((PlayerEntityModel) (Object) this, f);
