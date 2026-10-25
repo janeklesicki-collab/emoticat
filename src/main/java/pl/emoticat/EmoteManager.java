@@ -62,6 +62,7 @@ public class EmoteManager {
             }
             if (!p.isAlive()) { ACTIVE.remove(id); WARDEN.remove(id); continue; }
             Integer w = WARDEN.get(id);
+            if (w != null && p.isSneaking() && p.age - w > 5) { WARDEN.remove(id); w = null; }   // kucnięcie = koniec Wardena
             if (w != null && (moved || keys) && p.age - w < WARDEN_ANIM) WARDEN.put(id, p.age - WARDEN_ANIM);
         }
     }
@@ -191,7 +192,7 @@ public class EmoteManager {
         UUID id = p.getUuid();
         Active a = ACTIVE.get(id);
         Integer w = WARDEN.get(id);
-        if (a == null && w == null) return;
+        if (a == null && w == null) { FRAMES.remove(state); return; }   // stan renderu jest używany ponownie - czyścimy stare dane
         float now = p.age + td;
         float wt = w == null ? 0 : now - w;
         if (w != null && wt < 0) wt = WARDEN_ANIM;
